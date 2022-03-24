@@ -54,4 +54,5 @@ def U_Net(IMG_WIDTH, IMG_HEIGHT, IMG_CHANNELS):
     c9 = tf.keras.layers.Conv2D(16, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same')(c9)
 
     outputs = tf.keras.layers.Conv2D(1, (1, 1), activation='sigmoid')(c9)
-    return inputs, outputs
+    model = tf.keras.Model(inputs=[inputs], outputs=[outputs])
+    return model
