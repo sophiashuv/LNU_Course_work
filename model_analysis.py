@@ -12,9 +12,9 @@ def get_confusion_matrix(y_true, y_pred):
     TP = np.sum(y_pred * y_true)
     difference = y_pred - y_true
     sum = y_true + y_pred
-    TN = difference[difference == -1].shape[0]
+    FN = difference[difference == -1].shape[0]
     FP = difference[difference == 1].shape[0]
-    FN = sum[sum == 0].shape[0]
+    TN = sum[sum == 0].shape[0]
     return TN, FP, FN, TP
 
 
@@ -98,7 +98,7 @@ def save_metrics_to_file(metrics, metrics_path):
 
 
 def check_all_weights(model, SAVE_PATH, X_test, Y_test, test_ids, metrics, METRICS_PATH):
-    model_ids = next(os.walk(SAVE_PATH))[2][:-1]
+    model_ids = next(os.walk(SAVE_PATH))[2]
     for weights in model_ids:
         preds_test_t = model_predict(model, X_test, weights)
         metrics = get_metrics_df(preds_test_t, Y_test, test_ids, metrics, weights)
@@ -144,9 +144,9 @@ def plot_metric(METRICS_PATH, title, y_value):
         plt.plot(xlabels_new, weight_metrics[y_value], color=color, label=weight)
         plt.legend(loc="upper left")
         if y_value == 'mcc':
-            plt.ylim(-1.1, 1.6)
+            plt.ylim(-1.1, 1.7)
         else:
-            plt.ylim(-0.1, 1.6)
+            plt.ylim(-0.1, 1.7)
     plt.show()
 
 
@@ -163,9 +163,9 @@ def plot_metric_avg(METRICS_PATH, title, y_value):
     plt.xticks(size=10)
     plt.yticks(size=10)
     if y_value == 'mcc':
-        plt.ylim(-1.1, 1.6)
+        plt.ylim(-1.1, 1.7)
     else:
-        plt.ylim(-0.1, 1.6)
+        plt.ylim(-0.1, 1.7)
     plt.grid(zorder=0, which='major', color='#CCCCCC', linestyle='--')
     plt.show()
 
@@ -191,7 +191,7 @@ def show_segmentation(model, img_id, WEIGHTS_PATH, TEST_PATH, TEST_MASKS_PATH):
     plt.figure(figsize=(18, 9))
     plt.imshow(img)
     patches = [mpatches.Patch(color="#db3e32", label="FALSE POSITIVE"),
-               mpatches.Patch(color="#53a143", label="TRUE NEGATIVE"),
+               mpatches.Patch(color="#53a143", label="FALSE NEGATIVE"),
                mpatches.Patch(color="#1f75cc", label="TRUE POSITIVE")]
     plt.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.show()
@@ -223,7 +223,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--task",
-                        default='2',
+                        default='4',
                         help='1 - save_benchmark, 2 - plot_metric, 3 - plot_metric_avg, 4 - show_segmentation')
     parser.add_argument('--architecture',
                         default='U-Net',
@@ -241,8 +241,8 @@ if __name__ == '__main__':
     parser.add_argument("--IMG_PATH",
                         default=r"5F781B80-71AA-4BE3-ABD7-0198659685C7.jpg")
     parser.add_argument("--metrics",
-                        default=r"iou",
-                        help='possible: iou,dice,accuracy,precision,recall,mcc')
+                        default=r"accuracy",
+                        help='possible: iou, dice, accuracy, precision, recall, mcc')
 
     args = parser.parse_args()
     task = args.task
