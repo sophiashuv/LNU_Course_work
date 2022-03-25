@@ -125,7 +125,7 @@ def save_benchmark(model):
     check_all_weights(model, SAVE_PATH, X_test, Y_test, test_ids, metrics, METRICS_PATH)
 
 
-def plot_iou(METRICS_PATH, title, y_value):
+def plot_metric(METRICS_PATH, title, y_value):
     metrics = pd.read_csv(METRICS_PATH)
     metrics["WEIGHTS_PATH"] = metrics["WEIGHTS_PATH"].str.slice(len(title) + 7,)
     weights = metrics["WEIGHTS_PATH"]
@@ -144,13 +144,13 @@ def plot_iou(METRICS_PATH, title, y_value):
         plt.plot(xlabels_new, weight_metrics[y_value], color=color, label=weight)
         plt.legend(loc="upper left")
         if y_value == 'mcc':
-            plt.ylim(-1.1, 1.1)
+            plt.ylim(-1.1, 1.6)
         else:
-            plt.ylim(-0.1, 1.1)
+            plt.ylim(-0.1, 1.6)
     plt.show()
 
 
-def plot_iou_avg(METRICS_PATH, title, y_value):
+def plot_metric_avg(METRICS_PATH, title, y_value):
     metrics = pd.read_csv(METRICS_PATH)
     metrics = metrics.groupby(['WEIGHTS_PATH'], as_index=False).mean()
     metrics["WEIGHTS_PATH"] = metrics["WEIGHTS_PATH"].str.slice(len(title) + 7,)
@@ -163,9 +163,9 @@ def plot_iou_avg(METRICS_PATH, title, y_value):
     plt.xticks(size=10)
     plt.yticks(size=10)
     if y_value == 'mcc':
-        plt.ylim(-1.1, 1.1)
+        plt.ylim(-1.1, 1.6)
     else:
-        plt.ylim(-0.1, 1.1)
+        plt.ylim(-0.1, 1.6)
     plt.grid(zorder=0, which='major', color='#CCCCCC', linestyle='--')
     plt.show()
 
@@ -207,9 +207,9 @@ def analyse(task, architecture, metrics):
     if task == '1':
         save_benchmark(model)
     elif task == '2':
-        plot_iou(METRICS_PATH, architecture, metrics)
+        plot_metric(METRICS_PATH, architecture, metrics)
     elif task == '3':
-        plot_iou_avg(METRICS_PATH, architecture, metrics)
+        plot_metric_avg(METRICS_PATH, architecture, metrics)
     elif task == '4':
         show_segmentation(model, IMG_PATH, WEIGHTS_PATH, TEST_PATH, TEST_MASKS_PATH)
 
@@ -224,7 +224,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--task",
                         default='2',
-                        help='1 - save_benchmark, 2 - plot_iou, 3 - plot_iou_avg, 4 - show_segmentation')
+                        help='1 - save_benchmark, 2 - plot_metric, 3 - plot_metric_avg, 4 - show_segmentation')
     parser.add_argument('--architecture',
                         default='U-Net',
                         help='Possible: U-Net, FCN')
@@ -235,13 +235,14 @@ if __name__ == '__main__':
                         default=r'C:\Users\sophi\OneDrive\Desktop\inherited_dataset\masks\2018_01_08_tes/',
                         help='TEST MASKS PATH')
     parser.add_argument("--SAVE_PATH", default=r'D:\Azure Repository\LNU_Course_work\U_Net_data/', help='SAVE_PATH')
-    parser.add_argument("--WEIGHTS_PATH", default=r"FCN_model_epoch=5_valloss=0.1269.h5")
+    parser.add_argument("--WEIGHTS_PATH", default=r"u-net_model_epoch=10_valloss=0.1094.h5")
     parser.add_argument("--METRICS_PATH",
                         default=r"D:\Azure Repository\LNU_Course_work\metrics\U_Net_metrics.csv")
     parser.add_argument("--IMG_PATH",
                         default=r"5F781B80-71AA-4BE3-ABD7-0198659685C7.jpg")
     parser.add_argument("--metrics",
-                        default=r"iou")
+                        default=r"iou",
+                        help='possible: iou,dice,accuracy,precision,recall,mcc')
 
     args = parser.parse_args()
     task = args.task
