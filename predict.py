@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from train_model import *
 
 
-def model_predict(model, treshhold=0.5):
+def model_predict(model, X_train, Y_train, X_test, treshhold=0.5):
     preds_train = model.predict(X_train[:int(X_train.shape[0] * 0.9)], verbose=1)
     preds_val = model.predict(X_train[int(X_train.shape[0] * 0.9):], verbose=1)
     preds_test = model.predict(X_test, verbose=1)
@@ -44,14 +44,34 @@ def model_predict(model, treshhold=0.5):
     plt.show()
 
 
+def predict(architecture):
+    if architecture == 'U-Net':
+        model = U_Net(IMG_WIDTH, IMG_HEIGHT, IMG_CHANNELS)
+    elif architecture == 'FCN':
+        model = FCN(IMG_WIDTH, IMG_HEIGHT, IMG_CHANNELS)
+    else:
+        return
+    train_ids = next(os.walk(TRAIN_PATH))[2][:-1]
+    test_ids = next(os.walk(TEST_PATH))[2][:-1]
+
+    X_train, Y_train = resizing_train_data(train_ids, TRAIN_PATH, MASK_PATH)
+    X_test = resizing_test_data(test_ids, TEST_PATH)
+
+    model.load_weights(filepath=WEIGHTS_PATH)
+    model_predict(model, X_train, Y_train, X_test, TRESHHOLD)
+
+
 if __name__ == '__main__':
-    IMG_WIDTH = 224
-    IMG_HEIGHT = 224
+    IMG_WIDTH = 256
+    IMG_HEIGHT = 256
     IMG_CHANNELS = 3
 
     TRESHHOLD = 0.5
 
     parser = argparse.ArgumentParser()
+    parser.add_argument('--architecture',
+                       default='FCN',
+                       help='Possible: U-Net, FCN')
     parser.add_argument('--TRAIN_PATH',
                         default=r'C:\Users\sophi\OneDrive\Desktop\inherited_dataset\images\2018_01_08_tra/',
                         help='TRAIN PATH')
@@ -62,22 +82,12 @@ if __name__ == '__main__':
                         default=r'C:\Users\sophi\OneDrive\Desktop\inherited_dataset\images\2018_01_08_tes/',
                         help='TEST PATH')
     parser.add_argument("--SAVE_PATH", default=r'D:\Azure Repository\LNU_Course_work\data', help='SAVE_PATH')
-    parser.add_argument("--WEIGHTS_PATH", default=r"D:\Azure Repository\LNU_Course_work\FCN_data\FCN_model_epoch=1_valloss=0.7011.h5")
+    parser.add_argument("--WEIGHTS_PATH", default=r"D:\Azure Repository\LNU_Course_work\FCN_data\FCN_model_epoch=5_valloss=0.1269.h5")
     args = parser.parse_args()
+    architecture = args.architecture
     TRAIN_PATH = args.TRAIN_PATH
     MASK_PATH = args.MASK_PATH
     TEST_PATH = args.TEST_PATH
     SAVE_PATH = args.SAVE_PATH
     WEIGHTS_PATH = args.WEIGHTS_PATH
 
-    train_ids = next(os.walk(TRAIN_PATH))[2][:-1]
-    mask_ids = next(os.walk(MASK_PATH))[2][:-1]
-    test_ids = next(os.walk(TEST_PATH))[2][:-1]
-
-    X_train, Y_train = resizing_train_data(train_ids, TRAIN_PATH, MASK_PATH)
-    X_test = resizing_test_data(test_ids, TEST_PATH)
-
-    model = FCN(IMG_WIDTH, IMG_HEIGHT, IMG_CHANNELS)
-
-    model.load_weights(filepath=WEIGHTS_PATH)
-    model_predict(model, TRESHHOLD)

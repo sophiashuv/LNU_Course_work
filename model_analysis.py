@@ -223,10 +223,10 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--task",
-                        default='4',
+                        default='1',
                         help='1 - save_benchmark, 2 - plot_iou, 3 - plot_iou_avg, 4 - show_segmentation')
     parser.add_argument('--architecture',
-                       default='U-Net',
+                       default='FCN',
                        help='Possible: U-Net, FCN')
     parser.add_argument("--TEST_PATH",
                         default=r'C:\Users\sophi\OneDrive\Desktop\inherited_dataset\images\2018_01_08_tes/',
@@ -234,10 +234,10 @@ if __name__ == '__main__':
     parser.add_argument("--TEST_MASKS_PATH",
                         default=r'C:\Users\sophi\OneDrive\Desktop\inherited_dataset\masks\2018_01_08_tes/',
                         help='TEST MASKS PATH')
-    parser.add_argument("--SAVE_PATH", default=r'D:\Azure Repository\LNU_Course_work\U_Net_data/', help='SAVE_PATH')
-    parser.add_argument("--WEIGHTS_PATH", default=r"u-net_model_epoch=10_valloss=0.1094.h5")
+    parser.add_argument("--SAVE_PATH", default=r'D:\Azure Repository\LNU_Course_work\FCN_data/', help='SAVE_PATH')
+    parser.add_argument("--WEIGHTS_PATH", default=r"FCN_model_epoch=5_valloss=0.1269.h5")
     parser.add_argument("--METRICS_PATH",
-                        default=r"D:\Azure Repository\LNU_Course_work\U_Net_metrics.csv")
+                        default=r"D:\Azure Repository\LNU_Course_work\metrics\FCN_metrics.csv")
     parser.add_argument("--IMG_PATH",
                         default=r"5F781B80-71AA-4BE3-ABD7-0198659685C7.jpg")
     parser.add_argument("--metrics",
