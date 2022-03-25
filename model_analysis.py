@@ -127,10 +127,10 @@ def save_benchmark(model):
 
 def plot_iou(METRICS_PATH, title, y_value):
     metrics = pd.read_csv(METRICS_PATH)
-    metrics["WEIGHTS_PATH"] = metrics["WEIGHTS_PATH"].str.slice(12,)
+    metrics["WEIGHTS_PATH"] = metrics["WEIGHTS_PATH"].str.slice(len(title) + 7,)
     weights = metrics["WEIGHTS_PATH"]
     plt.figure(figsize=(18, 9))
-    plt.title(title)
+    plt.title(title + " Model")
     plt.xlabel('WEIGHTS_PATH', fontweight='bold')
     plt.ylabel(y_value, fontweight='bold')
     plt.xticks(size=7)
@@ -153,11 +153,11 @@ def plot_iou(METRICS_PATH, title, y_value):
 def plot_iou_avg(METRICS_PATH, title, y_value):
     metrics = pd.read_csv(METRICS_PATH)
     metrics = metrics.groupby(['WEIGHTS_PATH'], as_index=False).mean()
-    metrics["WEIGHTS_PATH"] = metrics["WEIGHTS_PATH"].str.slice(12,)
+    metrics["WEIGHTS_PATH"] = metrics["WEIGHTS_PATH"].str.slice(len(title) + 7,)
     plt.figure(figsize=(18, 9))
     xlabels_new = [re.sub("(.{10})", "\\1\n", label, 0, re.DOTALL) for label in metrics["WEIGHTS_PATH"]]
     plt.bar(xlabels_new, metrics[y_value], width=0.3, color="#f7dc57", zorder=3)
-    plt.title(title)
+    plt.title(title + " Model")
     plt.xlabel('WEIGHTS_PATH', fontweight='bold')
     plt.ylabel(y_value, fontweight='bold')
     plt.xticks(size=10)
@@ -207,9 +207,9 @@ def analyse(task, architecture, metrics):
     if task == '1':
         save_benchmark(model)
     elif task == '2':
-        plot_iou(METRICS_PATH, architecture + "Model", metrics)
+        plot_iou(METRICS_PATH, architecture, metrics)
     elif task == '3':
-        plot_iou_avg(METRICS_PATH, architecture + "Model", metrics)
+        plot_iou_avg(METRICS_PATH, architecture, metrics)
     elif task == '4':
         show_segmentation(model, IMG_PATH, WEIGHTS_PATH, TEST_PATH, TEST_MASKS_PATH)
 
@@ -223,25 +223,25 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--task",
-                        default='1',
+                        default='2',
                         help='1 - save_benchmark, 2 - plot_iou, 3 - plot_iou_avg, 4 - show_segmentation')
     parser.add_argument('--architecture',
-                       default='FCN',
-                       help='Possible: U-Net, FCN')
+                        default='U-Net',
+                        help='Possible: U-Net, FCN')
     parser.add_argument("--TEST_PATH",
                         default=r'C:\Users\sophi\OneDrive\Desktop\inherited_dataset\images\2018_01_08_tes/',
                         help='TEST PATH')
     parser.add_argument("--TEST_MASKS_PATH",
                         default=r'C:\Users\sophi\OneDrive\Desktop\inherited_dataset\masks\2018_01_08_tes/',
                         help='TEST MASKS PATH')
-    parser.add_argument("--SAVE_PATH", default=r'D:\Azure Repository\LNU_Course_work\FCN_data/', help='SAVE_PATH')
+    parser.add_argument("--SAVE_PATH", default=r'D:\Azure Repository\LNU_Course_work\U_Net_data/', help='SAVE_PATH')
     parser.add_argument("--WEIGHTS_PATH", default=r"FCN_model_epoch=5_valloss=0.1269.h5")
     parser.add_argument("--METRICS_PATH",
-                        default=r"D:\Azure Repository\LNU_Course_work\metrics\FCN_metrics.csv")
+                        default=r"D:\Azure Repository\LNU_Course_work\metrics\U_Net_metrics.csv")
     parser.add_argument("--IMG_PATH",
                         default=r"5F781B80-71AA-4BE3-ABD7-0198659685C7.jpg")
     parser.add_argument("--metrics",
-                        default=r"mcc")
+                        default=r"iou")
 
     args = parser.parse_args()
     task = args.task
