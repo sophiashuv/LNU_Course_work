@@ -36,7 +36,7 @@ def train_model(architecture, TRAIN_PATH, MASK_PATH, SAVE_PATH):
         model = FCN(IMG_WIDTH, IMG_HEIGHT, IMG_CHANNELS)
     else:
         return
-    train_ids = next(os.walk(TRAIN_PATH))[2][:-1]
+    train_ids = get_images_ids(TRAIN_PATH)
 
     X_train, Y_train = resizing_train_data(train_ids, TRAIN_PATH, MASK_PATH)
 

@@ -1,13 +1,17 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import cv2
 from tqdm import tqdm
+import os
 
 IMG_WIDTH = 256
 IMG_HEIGHT = 256
 IMG_CHANNELS = 3
 
-BIG_IMG_WIDTH = 5456
-BIG_IMG_HEIGHT = 3632
+
+def get_images_ids(path, amount=-1):
+    train_ids = next(os.walk(path))[2][:-1][:amount]
+    return train_ids
 
 
 def resizing_train_data(train_ids, TRAIN_PATH, MASK_PATH):
@@ -26,24 +30,19 @@ def resizing_train_data(train_ids, TRAIN_PATH, MASK_PATH):
     return X_train, Y_train
 
 
-def resizing_test_masks(test_ids, MASK_PATH):
-    X_test_masks = np.zeros((len(test_ids), BIG_IMG_HEIGHT, BIG_IMG_WIDTH, 1),  dtype=np.uint8)
-    for n, id_ in tqdm(enumerate(test_ids), total=len(test_ids)):
-        mask_path = MASK_PATH + id_[:-3] + "png"
-        mask = cv2.imread(mask_path, 0)
-        mask = cv2.resize(mask, (BIG_IMG_WIDTH, BIG_IMG_HEIGHT))
-        mask = np.reshape(mask, (BIG_IMG_HEIGHT, BIG_IMG_WIDTH, 1))
-        X_test_masks[n] = mask
-    return X_test_masks
+def read_test_img_mask(img_id, TEST_PATH, MASK_TEST_PATH):
+    img = cv2.imread(TEST_PATH + img_id)[:, :, :IMG_CHANNELS]
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img_small = cv2.resize(img, (IMG_WIDTH, IMG_HEIGHT))
+    mask = cv2.imread(MASK_TEST_PATH + img_id[:-3] + "png", 0) / 255
+    mask_small = cv2.resize(mask, (IMG_WIDTH, IMG_HEIGHT))
+    mask_small = np.reshape(mask_small, (IMG_HEIGHT, IMG_WIDTH, 1))
+    return np.array([img_small]), np.array([mask_small])
 
 
-def resizing_test_data(test_ids, TEST_PATH):
-    X_test = np.zeros((len(test_ids), IMG_HEIGHT, IMG_WIDTH, IMG_CHANNELS), dtype=np.uint8)
-    for n, id_ in tqdm(enumerate(test_ids), total=len(test_ids)):
-        path = TEST_PATH + id_
-        img = cv2.imread(path)[:, :, :IMG_CHANNELS]
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img = cv2.resize(img, (IMG_HEIGHT, IMG_WIDTH))
-        X_test[n] = img
-    return X_test
+def save_images(ids, images, save_path):
+    if np.max(images) <= 1:
+        images = images * 255
+    for img, id_ in zip(images, ids):
+        cv2.imwrite(os.path.join(save_path, id_), img)
 
