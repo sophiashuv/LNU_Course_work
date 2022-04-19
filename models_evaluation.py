@@ -1,37 +1,33 @@
 import pandas as pd
 
-from matrices import *
+from metrics import *
 from model_predict import *
 
 
-def get_matrices_df(test_ids, Y_test, Y_pred, matrices, architecture, THRESHOLD):
+def get_metrics_df(test_ids, Y_test, Y_pred, metrics, architecture, THRESHOLD):
     for predicted_mask, groundtruth_mask, id_ in zip(Y_test, Y_pred, test_ids):
         iou = jacard_coef(groundtruth_mask, predicted_mask)
-        dice = dice_coef(groundtruth_mask, predicted_mask)
         accuracy = accuracy_coef(groundtruth_mask, predicted_mask)
         precision = precision_coef(groundtruth_mask, predicted_mask)
         recall = recall_coef(groundtruth_mask, predicted_mask)
         mcc = mcc_coef(groundtruth_mask, predicted_mask)
-        tpr = TPR_coef(groundtruth_mask, predicted_mask)
-        fpr = FPR_coef(groundtruth_mask, predicted_mask)
+        f1 = F1_coef(groundtruth_mask, predicted_mask)
         data = {"MODEL": architecture,
                 "imageFileName": id_,
                 "THRESHOLD": THRESHOLD,
                 "iou": iou,
-                "dice": dice,
                 "accuracy": accuracy,
                 "precision": precision,
                 "recall": recall,
                 "mcc": mcc,
-                'TPR': tpr,
-                'FPR': fpr
+                'f1': f1
                 }
-        matrices = matrices.append(data, ignore_index=True)
-    return matrices
+        metrics = metrics.append(data, ignore_index=True)
+    return metrics
 
 
-def save_matrices_to_file(matrices, matrices_path):
-    matrices.to_csv(matrices_path, mode='a', index=False, header=False)
+def save_metrics_to_file(metrics, metrics_path):
+    metrics.to_csv(metrics_path, mode='a', index=False, header=False)
 
 
 def save_benchmark(architecture):
@@ -43,9 +39,9 @@ def save_benchmark(architecture):
         return
 
     test_ids, X_test, Y_test, Y_pred = predict_images(model, TEST_PATH, MASK_TEST_PATH, WEIGHTS_PATH, THRESHOLD)
-    matrices = pd.DataFrame(columns=['MODEL', 'imageFileName', "THRESHOLD", 'iou', 'dice', 'accuracy', 'precision', 'recall', 'TPR', 'FPR'])
-    matrices = get_matrices_df(test_ids, Y_test, Y_pred, matrices, architecture, THRESHOLD)
-    save_matrices_to_file(matrices, MATRICES_PATH)
+    metrics = pd.DataFrame(columns=['MODEL', 'imageFileName', "THRESHOLD", 'iou', 'accuracy', 'precision', 'recall', 'f1'])
+    metrics = get_metrics_df(test_ids, Y_test, Y_pred, metrics, architecture, THRESHOLD)
+    save_metrics_to_file(metrics, METRICS_PATH)
 
 
 if __name__ == '__main__':
@@ -67,14 +63,14 @@ if __name__ == '__main__':
                         help='TEST MASKS PATH')
     parser.add_argument("--WEIGHTS_PATH",
                         default=r"D:\Azure Repository\LNU_Course_work\FCN_data\FCN_model_epoch=5_valloss=0.1269.h5")
-    parser.add_argument("--MATRICES_PATH",
-                        default=r"D:\Azure Repository\LNU_Course_work\metrics\U_Net_metrics.csv")
+    parser.add_argument("--METRICS_PATH",
+                        default=r"D:\Azure Repository\LNU_Course_work\metrics\metrics.csv")
     args = parser.parse_args()
     architecture = args.architecture
     THRESHOLD = args.THRESHOLD
     TEST_PATH = args.TEST_PATH
     MASK_TEST_PATH = args.MASK_TEST_PATH
     WEIGHTS_PATH = args.WEIGHTS_PATH
-    MATRICES_PATH = args.MATRICES_PATH
+    METRICS_PATH = args.METRICS_PATH
 
     save_benchmark(architecture)
