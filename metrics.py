@@ -72,6 +72,6 @@ def mcc_coef(y_true, y_pred):
 
 def F1_coef(y_true, y_pred):
     TN, FP, FN, TP = get_confusion_matrix(y_true, y_pred)
-    if (TP + FP == 0) or (TP + FN == 0) or (TN + FP == 0) or (TN + FN == 0):
+    if TP + (FP + FN)/2:
         return 0
     return TP / (TP + (FP + FN)/2)

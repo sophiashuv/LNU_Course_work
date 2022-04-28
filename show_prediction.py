@@ -58,7 +58,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--task",
-                        default='1',
+                        default='2',
                         help='1 - show image prediction, 2 - show confusion matrix on prediction')
     parser.add_argument('--architecture',
                         default='U-Net',

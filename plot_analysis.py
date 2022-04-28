@@ -16,8 +16,9 @@ def plot_metrics(models, x, ys, y_value):
     for y, model in zip(ys, models):
         color = np.random.randint(255, size=3) / 255
         xlabels_new = [re.sub("(.{10})", "\\1\n", label, 0, re.DOTALL) for label in x]
-        plt.plot(xlabels_new, y, marker='o', color=color, label=model)
-        plt.legend(loc="upper left")
+        # plt.plot(xlabels_new, y, 'o', markersize=20, color=color, label=model)
+        plt.plot(xlabels_new, y, '-ok', color=color, label=model)
+        plt.legend(loc="upper left", title="Models", fontsize=12, title_fontsize=15)
     if y_value == 'mcc':
         plt.ylim(-1.1, 1.7)
     else:
@@ -26,8 +27,6 @@ def plot_metrics(models, x, ys, y_value):
 
 
 def plot_average(metrics):
-    print(metrics)
-    y = ["iou", "accuracy", "precision", "recall", "mcc", "f1"]
     colors = ["#85C1E9", "#F7DC6F"]
     metrics.plot(y=["U-Net", "FCN"], use_index=True, color=colors, kind="bar", zorder=3, figsize=(18, 9))
     plt.title("Models Comparison")

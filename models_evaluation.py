@@ -51,7 +51,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--architecture',
-                        default='FCN',
+                        default='U-Net',
                         help='Possible: U-Net, FCN')
     parser.add_argument('--THRESHOLD',
                         default=0.3)
@@ -62,7 +62,7 @@ if __name__ == '__main__':
                         default=r'C:\Users\sophi\OneDrive\Desktop\inherited_dataset\masks\2018_01_08_tes/',
                         help='TEST MASKS PATH')
     parser.add_argument("--WEIGHTS_PATH",
-                        default=r"D:\Azure Repository\LNU_Course_work\FCN_data\FCN_model_epoch=5_valloss=0.1269.h5")
+                        default=r"D:\Azure Repository\LNU_Course_work\U_Net_data\u-net_model_epoch=10_valloss=0.1094.h5")
     parser.add_argument("--METRICS_PATH",
                         default=r"D:\Azure Repository\LNU_Course_work\metrics\metrics.csv")
     args = parser.parse_args()
