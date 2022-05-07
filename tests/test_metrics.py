@@ -28,6 +28,11 @@ class TestKmeam(TestCase):
         self.pred_mask4 = np.full((10, 10), 0, dtype=np.uint8)
         self.pred_mask4[:5, :5] = 1
 
+        self.mask5 = np.full((10, 10), 0, dtype=np.uint8)
+        self.mask5[:5, :5] = 1
+        self.pred_mask5 = np.full((10, 10), 0, dtype=np.uint8)
+        self.pred_mask5[2:7, 2:7] = 1
+
     def test_im1(self):
         tpr_res = TPR_coef(self.mask1, self.pred_mask1)
         fpr_res = FPR_coef(self.mask1, self.pred_mask1)
@@ -49,6 +54,12 @@ class TestKmeam(TestCase):
     def test_im4(self):
         tpr_res = TPR_coef(self.mask4, self.pred_mask4)
         fpr_res = FPR_coef(self.mask4, self.pred_mask4)
+        np.testing.assert_almost_equal(tpr_res, 9.0/25)
+        np.testing.assert_almost_equal(fpr_res, 16.0/75)
+
+    def test_im5(self):
+        tpr_res = TPR_coef(self.mask5, self.pred_mask5)
+        fpr_res = FPR_coef(self.mask5, self.pred_mask5)
         np.testing.assert_almost_equal(tpr_res, 9.0/25)
         np.testing.assert_almost_equal(fpr_res, 16.0/75)
 

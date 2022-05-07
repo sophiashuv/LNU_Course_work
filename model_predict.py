@@ -3,6 +3,7 @@ from train_model import *
 
 def model_predict(model, X_test, threshold="no"):
     preds_test = model.predict(X_test, verbose=1)
+
     if threshold == "no":
         return preds_test
     preds_test = (preds_test > threshold).astype(np.uint8)
@@ -51,24 +52,24 @@ if __name__ == '__main__':
     IMG_HEIGHT = 256
     IMG_CHANNELS = 3
 
-    TRESHHOLD = 0.5
+    TRESHHOLD = 'no'
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--task',
                         default='2',
                         help='Possible: 1 - predict single image, 2 - predict many images')
-    parser.add_argument('--architecture', default='U-Net', help='Possible: U-Net, FCN')
+    parser.add_argument('--architecture', default='FCN', help='Possible: U-Net, FCN')
     parser.add_argument("--TEST_PATH",
                         default=r'C:\Users\sophi\OneDrive\Desktop\inherited_dataset\images\2018_01_08_tes/',
                         help='TEST PATH')
     parser.add_argument("--MASK_TEST_PATH",
                         default=r'C:\Users\sophi\OneDrive\Desktop\inherited_dataset\masks\2018_01_08_tes/',
                         help='TEST MASK PATH')
-    parser.add_argument("--WEIGHTS_PATH", default=r"D:\Azure Repository\LNU_Course_work\U_Net_data\u-net_model_epoch=10_valloss=0.1094.h5")
+    parser.add_argument("--WEIGHTS_PATH", default=r"D:\Azure Repository\LNU_Course_work\FCN_data\FCN_model_epoch=5_valloss=0.1269.h5")
     parser.add_argument("--IMG_PATH",
                         default=r"5F781B80-71AA-4BE3-ABD7-0198659685C7.jpg")
     parser.add_argument("--SAVE_PATH",
-                        default=r"D:\Azure Repository\LNU_Course_work\rubbish", help='Path to save folder')
+                        default=r"D:\Azure Repository\LNU_Course_work\rubbish\FCN", help='Path to save folder')
 
     args = parser.parse_args()
     task = args.task

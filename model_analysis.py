@@ -6,6 +6,7 @@ from model_predict import *
 
 def get_fp_tp(masks, masks_pred):
     thresholds = np.linspace(0, 1, 50)
+    # thresholds = np.unique(masks_pred)
     columns = ['threshold', 'false_positive_rate', 'true_positive_rate']
     inputs = pd.DataFrame(columns=columns)
     for i, threshold in enumerate(thresholds):
@@ -32,20 +33,25 @@ def get_precision_recall(masks, masks_pred):
     return inputs
 
 
-def build_roc_curve(architectures, WEIGHTS_PATH, TEST_PATH, MASK_TEST_PATH):
+def build_roc_curve(architectures, way,  WEIGHTS_PATH, TEST_PATH, MASK_TEST_PATH, PRED_PATH=None):
     fprs, tprs, roc_aucs = [], [], []
-    for architecture, weight in zip(architectures, WEIGHTS_PATH):
+    for i, (architecture, weight) in enumerate(zip(architectures, WEIGHTS_PATH)):
         if architecture == 'U-Net':
             model = U_Net(IMG_WIDTH, IMG_HEIGHT, IMG_CHANNELS)
         elif architecture == 'FCN':
             model = FCN(IMG_WIDTH, IMG_HEIGHT, IMG_CHANNELS)
         else:
             return
-        _, X_test, Y_test, Y_pred = predict_images(model, TEST_PATH, MASK_TEST_PATH, weight, "no", 20)
+        if way == '1':
+            _, X_test, Y_test, Y_pred = predict_images(model, TEST_PATH, MASK_TEST_PATH, weight, "no", 20)
+        elif way == '2':
+            _, X_test, Y_test, Y_pred = read_predicted_images(TEST_PATH, MASK_TEST_PATH, PRED_PATH[i], "no", 20)
+        else:
+            return
 
         inputs = get_fp_tp(Y_test, Y_pred)
         fpr, tpr = inputs['false_positive_rate'], inputs['true_positive_rate']
-
+        # fpr, tpr, _ = roc_curve(Y_test.ravel(), Y_pred.ravel())
         roc_auc = auc(fpr, tpr)
         fprs.append(fpr)
         tprs.append(tpr)
@@ -53,16 +59,25 @@ def build_roc_curve(architectures, WEIGHTS_PATH, TEST_PATH, MASK_TEST_PATH):
     return fprs, tprs, roc_aucs
 
 
-def build_precision_recall_curve(architectures, WEIGHTS_PATH, TEST_PATH, MASK_TEST_PATH):
+def build_precision_recall_curve(architectures, way,  WEIGHTS_PATH, TEST_PATH, MASK_TEST_PATH, PRED_PATH=None):
     precisions, recols, pr_aucs = [], [], []
-    for architecture, weight in zip(architectures, WEIGHTS_PATH):
+    for i, (architecture, weight) in enumerate(zip(architectures, WEIGHTS_PATH)):
         if architecture == 'U-Net':
             model = U_Net(IMG_WIDTH, IMG_HEIGHT, IMG_CHANNELS)
         elif architecture == 'FCN':
             model = FCN(IMG_WIDTH, IMG_HEIGHT, IMG_CHANNELS)
+        elif architecture == 'DeeplabV3Plus':
+            model = DeeplabV3Plus(IMG_WIDTH, IMG_HEIGHT, IMG_CHANNELS)
         else:
             return
-        _, X_test, Y_test, Y_pred = predict_images(model, TEST_PATH, MASK_TEST_PATH, weight, "no", 20)
+
+        if way == '1':
+            _, X_test, Y_test, Y_pred = predict_images(model, TEST_PATH, MASK_TEST_PATH, weight, "no", 20)
+        elif way == '2':
+            test_ids, X_test, Y_test, Y_pred = read_predicted_images(TEST_PATH, MASK_TEST_PATH, PRED_PATH[i], "no", 20)
+        else:
+            return
+
         inputs = get_precision_recall(Y_test, Y_pred)
         precision, recall = inputs['precision_rate'], inputs['recall_rate']
         pr_auc = auc(recall, precision)

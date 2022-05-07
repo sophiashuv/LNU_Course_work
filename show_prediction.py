@@ -44,7 +44,13 @@ def show_plot(architecture):
     else:
         return
 
-    test_ids, X_test, Y_test, Y_pred = predict_image(model, IMG_PATH, TEST_PATH, MASK_TEST_PATH, WEIGHTS_PATH, THRESHOLD)
+    if way == '1':
+        test_ids, X_test, Y_test, Y_pred = predict_image(model, IMG_PATH, TEST_PATH, MASK_TEST_PATH, WEIGHTS_PATH, THRESHOLD)
+    elif way == '2':
+        test_ids, X_test, Y_test, Y_pred = read_predicted_image(IMG_PATH, TEST_PATH, MASK_TEST_PATH, PRED_PATH, THRESHOLD)
+    else:
+        return
+
     if task == '1':
         show_image_prediction(test_ids, X_test, Y_test, Y_pred)
     if task == '2':
@@ -60,6 +66,9 @@ if __name__ == '__main__':
     parser.add_argument("--task",
                         default='2',
                         help='1 - show image prediction, 2 - show confusion matrix on prediction')
+    parser.add_argument("--way",
+                        default='2',
+                        help='1 - predict, 2 - read predictions')
     parser.add_argument('--architecture',
                         default='U-Net',
                         help='Possible: U-Net, FCN')
@@ -71,6 +80,9 @@ if __name__ == '__main__':
     parser.add_argument("--MASK_TEST_PATH",
                         default=r'C:\Users\sophi\OneDrive\Desktop\inherited_dataset\masks\2018_01_08_tes/',
                         help='TEST MASKS PATH')
+    parser.add_argument("--PRED_PATH",
+                        default=r'D:\Azure Repository\LNU_Course_work\rubbish\U-Net/',
+                        help='PRED_PATH')
     parser.add_argument("--WEIGHTS_PATH",
                         default=r"D:\Azure Repository\LNU_Course_work\U_Net_data\u-net_model_epoch=10_valloss=0.1094.h5")
     parser.add_argument("--IMG_PATH",
@@ -78,10 +90,12 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     task = args.task
+    way = args.way
     architecture = args.architecture
     THRESHOLD = args.THRESHOLD
     TEST_PATH = args.TEST_PATH
     MASK_TEST_PATH = args.MASK_TEST_PATH
+    PRED_PATH = args.PRED_PATH
     WEIGHTS_PATH = args.WEIGHTS_PATH
     IMG_PATH = args.IMG_PATH
 

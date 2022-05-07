@@ -46,3 +46,31 @@ def save_images(ids, images, save_path):
     for img, id_ in zip(images, ids):
         cv2.imwrite(os.path.join(save_path, id_), img)
 
+
+def read_predicted_images(TEST_PATH, MASK_TEST_PATH, PRED_PATH, TRESHHOLD, amount=-1):
+    test_ids = get_images_ids(TEST_PATH, amount)
+    X_test, Y_test = resizing_train_data(test_ids, TEST_PATH, MASK_TEST_PATH)
+    Y_pred = np.zeros((len(test_ids), IMG_HEIGHT, IMG_WIDTH, 1), dtype=np.float32)
+    for n, id_ in tqdm(enumerate(test_ids), total=len(test_ids)):
+        mask = cv2.imread(PRED_PATH + id_[:-3] + "jpg", 0)
+        mask = cv2.resize(mask, (IMG_WIDTH, IMG_HEIGHT))
+        mask = np.reshape(mask, (IMG_HEIGHT, IMG_WIDTH, 1))
+        Y_pred[n] = mask/255
+    if TRESHHOLD != "no":
+        Y_pred = (Y_pred > TRESHHOLD).astype(np.uint8)
+    n = Y_test.shape[0]
+    Y_test, Y_pred = np.reshape(Y_test, (n, IMG_HEIGHT, IMG_WIDTH)), np.reshape(Y_pred, (n, IMG_HEIGHT, IMG_WIDTH))
+    return test_ids, X_test, Y_test, Y_pred
+
+
+def read_predicted_image(img_id, TEST_PATH, MASK_TEST_PATH, PRED_PATH, TRESHHOLD):
+    X_test, Y_test = read_test_img_mask(img_id, TEST_PATH, MASK_TEST_PATH)
+    Y_pred = cv2.imread(PRED_PATH + img_id[:-3] + "jpg", 0)
+    Y_pred = cv2.resize(Y_pred, (IMG_WIDTH, IMG_HEIGHT))
+    Y_pred = np.reshape(Y_pred, (IMG_HEIGHT, IMG_WIDTH, 1))/255.0
+    Y_pred = np.array([Y_pred])
+    if TRESHHOLD != "no":
+        Y_pred = (Y_pred > TRESHHOLD).astype(np.uint8)
+    n = Y_test.shape[0]
+    Y_test, Y_pred = np.reshape(Y_test, (n, IMG_HEIGHT, IMG_WIDTH)), np.reshape(Y_pred, (n, IMG_HEIGHT, IMG_WIDTH))
+    return np.array([img_id]), X_test, Y_test, Y_pred

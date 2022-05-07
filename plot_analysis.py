@@ -73,19 +73,23 @@ def plot_comparison(task):
         plot_average(metrics)
     elif task == '3':
         architectures = ["U-Net", "FCN"]
-        fprs, tprs, roc_aucs = build_roc_curve(architectures, [WEIGHTS_PATH_UNET, WEIGHTS_PATH_FCN], TEST_PATH, MASK_TEST_PATH)
+        fprs, tprs, roc_aucs = build_roc_curve(architectures, way, [WEIGHTS_PATH_UNET, WEIGHTS_PATH_FCN], TEST_PATH, MASK_TEST_PATH, [PRED_PATH_UNet, PRED_PATH_FCN])
+
         plot_roc_curve(architectures, fprs, tprs, roc_aucs)
     elif task == '4':
         architectures = ["U-Net", "FCN"]
-        precisions, recols, pr_aucs = build_precision_recall_curve(architectures, [WEIGHTS_PATH_UNET, WEIGHTS_PATH_FCN], TEST_PATH, MASK_TEST_PATH)
+        precisions, recols, pr_aucs = build_precision_recall_curve(architectures, way, [WEIGHTS_PATH_UNET, WEIGHTS_PATH_FCN], TEST_PATH, MASK_TEST_PATH, [PRED_PATH_UNet, PRED_PATH_FCN])
         plot_precision_recall_curve(architectures, precisions, recols, pr_aucs)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--task",
-                        default='4',
+                        default='2',
                         help='1 - plot_metrics, 2 - plot_average 3 - plot_roc_curve 4 - plot_precision_recall_curve')
+    parser.add_argument("--way",
+                        default='1',
+                        help='1 - predict, 2 - read predictions')
     parser.add_argument('--THRESHOLD',
                         default=0.3)
     parser.add_argument("--TEST_PATH",
@@ -94,23 +98,32 @@ if __name__ == '__main__':
     parser.add_argument("--MASK_TEST_PATH",
                         default=r'C:\Users\sophi\OneDrive\Desktop\inherited_dataset\masks\2018_01_08_tes/',
                         help='TEST MASKS PATH')
+    parser.add_argument("--PRED_PATH_UNet",
+                        default=r'D:\Azure Repository\LNU_Course_work\rubbish\U-Net/',
+                        help='PRED_PATH')
+    parser.add_argument("--PRED_PATH_FCN",
+                        default=r'D:\Azure Repository\LNU_Course_work\rubbish\FCN/',
+                        help='PRED_PATH')
     parser.add_argument("--WEIGHTS_PATH_UNET",
                         default=r"D:\Azure Repository\LNU_Course_work\U_Net_data\u-net_model_epoch=10_valloss=0.1094.h5")
     parser.add_argument("--WEIGHTS_PATH_FCN",
                         default=r"D:\Azure Repository\LNU_Course_work\FCN_data\FCN_model_epoch=5_valloss=0.1269.h5")
     parser.add_argument("--metric",
-                        default='mcc',
+                        default='iou',
                         help='"iou", "accuracy", "precision", "recall", "mcc"')
     parser.add_argument("--METRICS_PATH",
                         default=r"D:\Azure Repository\LNU_Course_work\metrics\metrics.csv")
 
     args = parser.parse_args()
     task = args.task
+    way = args.way
     THRESHOLD = args.THRESHOLD
     metric = args.metric
     METRICS_PATH = args.METRICS_PATH
     TEST_PATH = args.TEST_PATH
     MASK_TEST_PATH = args.MASK_TEST_PATH
+    PRED_PATH_UNet = args.PRED_PATH_UNet
+    PRED_PATH_FCN = args.PRED_PATH_FCN
     WEIGHTS_PATH_UNET = args.WEIGHTS_PATH_UNET
     WEIGHTS_PATH_FCN = args.WEIGHTS_PATH_FCN
 

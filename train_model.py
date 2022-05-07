@@ -4,6 +4,7 @@ import os
 from data_preparation import *
 from models.U_Net import *
 from models.FCN import *
+from models.DeeplabV3Plus import *
 
 IMG_WIDTH = 256
 IMG_HEIGHT = 256
@@ -18,7 +19,7 @@ def create_model(model):
 
 def model_fit(model, X_train, Y_train, SAVE_PATH, log_dir):
     checkpointsuffix = "_epoch={epoch:d}_valloss={val_loss:.4f}.h5"
-    checkpointfile = os.path.join(SAVE_PATH, "FCN_model" + checkpointsuffix)
+    checkpointfile = os.path.join(SAVE_PATH, architecture + "_model" + checkpointsuffix)
 
     callbacks = [
             tf.keras.callbacks.ModelCheckpoint(checkpointfile, verbose=1, save_best_only=True),
@@ -34,6 +35,8 @@ def train_model(architecture, TRAIN_PATH, MASK_PATH, SAVE_PATH):
         model = U_Net(IMG_WIDTH, IMG_HEIGHT, IMG_CHANNELS)
     elif architecture == 'FCN':
         model = FCN(IMG_WIDTH, IMG_HEIGHT, IMG_CHANNELS)
+    elif architecture == 'DeeplabV3Plus':
+        model = DeeplabV3Plus(IMG_WIDTH, IMG_HEIGHT, IMG_CHANNELS)
     else:
         return
     train_ids = get_images_ids(TRAIN_PATH)
@@ -47,7 +50,7 @@ def train_model(architecture, TRAIN_PATH, MASK_PATH, SAVE_PATH):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--architecture',
-                        default='FCN',
+                        default='U-Net',
                         help='Possible: U-Net, FCN')
     parser.add_argument('--TRAIN_PATH',
                         default=r'C:\Users\sophi\OneDrive\Desktop\inherited_dataset\images\2018_01_08_tra/',
@@ -56,7 +59,7 @@ if __name__ == '__main__':
                         default=r'C:\Users\sophi\OneDrive\Desktop\inherited_dataset\masks\2018_01_08_tra\2018_01_08_tra/',
                         help='MASK MATH')
     parser.add_argument("--SAVE_PATH",
-                        default=r'D:\Azure Repository\LNU_Course_work\FCN_data/',
+                        default=r'D:\Azure Repository\LNU_Course_work\U_Net_data/',
                         help='SAVE_PATH')
 
     args = parser.parse_args()
