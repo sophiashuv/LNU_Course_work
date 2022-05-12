@@ -43,7 +43,7 @@ def save_predicted_data(architecture):
         test_ids, X_test, Y_test, Y_pred = predict_images(model, TEST_PATH, MASK_TEST_PATH, WEIGHTS_PATH, TRESHHOLD)
     else:
         return
-    save_images(test_ids, Y_pred, SAVE_PATH)
+    save_images(test_ids, Y_pred, SAVE_PATH, FORMAT)
     return test_ids, X_test, Y_test, Y_pred
 
 
@@ -69,7 +69,9 @@ if __name__ == '__main__':
     parser.add_argument("--IMG_PATH",
                         default=r"5F781B80-71AA-4BE3-ABD7-0198659685C7.jpg")
     parser.add_argument("--SAVE_PATH",
-                        default=r"D:\Azure Repository\LNU_Course_work\rubbish\FCN", help='Path to save folder')
+                        default=r"D:\Azure Repository\LNU_Course_work\predictions\FCN", help='Path to save folder')
+    parser.add_argument("--FORMAT",
+                        default=".npy", help='Path to save folder')
 
     args = parser.parse_args()
     task = args.task
@@ -79,5 +81,6 @@ if __name__ == '__main__':
     WEIGHTS_PATH = args.WEIGHTS_PATH
     IMG_PATH = args.IMG_PATH
     SAVE_PATH = args.SAVE_PATH
+    FORMAT = args.FORMAT
 
     save_predicted_data(architecture)

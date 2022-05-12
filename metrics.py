@@ -38,28 +38,28 @@ def accuracy_coef(y_true, y_pred):
 def precision_coef(y_true, y_pred):
     TN, FP, FN, TP = get_confusion_matrix(y_true, y_pred)
     if FP + TP == 0:
-        return 0
+        return None
     return TP/(FP + TP)
 
 
 def recall_coef(y_true, y_pred):
     TN, FP, FN, TP = get_confusion_matrix(y_true, y_pred)
     if FN + TP == 0:
-        return 0
+        return None
     return TP/(FN + TP)
 
 
 def TPR_coef(y_true, y_pred):
     TN, FP, FN, TP = get_confusion_matrix(y_true, y_pred)
     if FN + TP == 0:
-        return 0
+        return None
     return TP/(FN + TP)
 
 
 def FPR_coef(y_true, y_pred):
     TN, FP, FN, TP = get_confusion_matrix(y_true, y_pred)
     if FP + TN == 0:
-        return 0
+        return None
     return FP/(FP + TN)
 
 

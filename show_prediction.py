@@ -47,10 +47,9 @@ def show_plot(architecture):
     if way == '1':
         test_ids, X_test, Y_test, Y_pred = predict_image(model, IMG_PATH, TEST_PATH, MASK_TEST_PATH, WEIGHTS_PATH, THRESHOLD)
     elif way == '2':
-        test_ids, X_test, Y_test, Y_pred = read_predicted_image(IMG_PATH, TEST_PATH, MASK_TEST_PATH, PRED_PATH, THRESHOLD)
+        test_ids, X_test, Y_test, Y_pred = read_predicted_image(IMG_PATH, TEST_PATH, MASK_TEST_PATH, PRED_PATH, THRESHOLD, FORMAT)
     else:
         return
-
     if task == '1':
         show_image_prediction(test_ids, X_test, Y_test, Y_pred)
     if task == '2':
@@ -81,8 +80,11 @@ if __name__ == '__main__':
                         default=r'C:\Users\sophi\OneDrive\Desktop\inherited_dataset\masks\2018_01_08_tes/',
                         help='TEST MASKS PATH')
     parser.add_argument("--PRED_PATH",
-                        default=r'D:\Azure Repository\LNU_Course_work\rubbish\U-Net/',
+                        default=r'D:\Azure Repository\LNU_Course_work\predictions\U-Net/',
                         help='PRED_PATH')
+    parser.add_argument("--FORMAT",
+                        default=r'.npy',
+                        help='Possible: .npy, .jpg')
     parser.add_argument("--WEIGHTS_PATH",
                         default=r"D:\Azure Repository\LNU_Course_work\U_Net_data\u-net_model_epoch=10_valloss=0.1094.h5")
     parser.add_argument("--IMG_PATH",
@@ -96,6 +98,7 @@ if __name__ == '__main__':
     TEST_PATH = args.TEST_PATH
     MASK_TEST_PATH = args.MASK_TEST_PATH
     PRED_PATH = args.PRED_PATH
+    FORMAT = args.FORMAT
     WEIGHTS_PATH = args.WEIGHTS_PATH
     IMG_PATH = args.IMG_PATH
 

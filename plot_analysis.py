@@ -45,9 +45,9 @@ def plot_roc_curve(architectures, fprs, tprs, roc_aucs):
     ax.set_ylabel('True Positive Rate')
     ax.set_title('Receiver operating characteristic')
     for architecture, fpr, tpr, roc_auc in zip(architectures, fprs, tprs, roc_aucs):
-        ax.plot(fpr, tpr)
         ax.plot(fpr, tpr, label='ROC curve %s (area = %0.2f)' % (architecture, roc_auc))
     ax.legend(loc="lower right")
+    plt.grid(which='major', color='#CCCCCC', linestyle='--')
     plt.show()
 
 
@@ -55,12 +55,13 @@ def plot_precision_recall_curve(architectures, precisions, recols, pr_aucs):
     fig, ax = plt.subplots(1, 1)
     ax.set_xlim([0.0, 1.0])
     ax.set_ylim([0.0, 1.05])
-    ax.set_xlabel('Recall')
-    ax.set_ylabel('Precision')
+    ax.set_xlabel('Precision')
+    ax.set_ylabel('Recall')
     ax.set_title('Precision-Recall Curves')
-    for architecture,recall, precision, pr_auc in zip(architectures, recols, precisions,  pr_aucs):
-        ax.plot(recall, precision, label='Precision-Recall Curves %s (area = %0.2f)' % (architecture, pr_auc))
+    for architecture, recall, precision, pr_auc in zip(architectures, recols, precisions,  pr_aucs):
+        ax.plot(precision, recall, label='Precision-Recall Curves %s (area = %0.2f)' % (architecture, pr_auc))
     ax.legend(loc="lower right")
+    plt.grid(which='major', color='#CCCCCC', linestyle='--')
     plt.show()
 
 
@@ -73,22 +74,21 @@ def plot_comparison(task):
         plot_average(metrics)
     elif task == '3':
         architectures = ["U-Net", "FCN"]
-        fprs, tprs, roc_aucs = build_roc_curve(architectures, way, [WEIGHTS_PATH_UNET, WEIGHTS_PATH_FCN], TEST_PATH, MASK_TEST_PATH, [PRED_PATH_UNet, PRED_PATH_FCN])
-
+        fprs, tprs, roc_aucs = build_roc_curve(architectures, way, [WEIGHTS_PATH_UNET, WEIGHTS_PATH_FCN], TEST_PATH, MASK_TEST_PATH, [PRED_PATH_UNet, PRED_PATH_FCN], FORMAT)
         plot_roc_curve(architectures, fprs, tprs, roc_aucs)
     elif task == '4':
         architectures = ["U-Net", "FCN"]
-        precisions, recols, pr_aucs = build_precision_recall_curve(architectures, way, [WEIGHTS_PATH_UNET, WEIGHTS_PATH_FCN], TEST_PATH, MASK_TEST_PATH, [PRED_PATH_UNet, PRED_PATH_FCN])
+        precisions, recols, pr_aucs = build_precision_recall_curve(architectures, way, [WEIGHTS_PATH_UNET, WEIGHTS_PATH_FCN], TEST_PATH, MASK_TEST_PATH, [PRED_PATH_UNet, PRED_PATH_FCN], FORMAT)
         plot_precision_recall_curve(architectures, precisions, recols, pr_aucs)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--task",
-                        default='2',
+                        default='3',
                         help='1 - plot_metrics, 2 - plot_average 3 - plot_roc_curve 4 - plot_precision_recall_curve')
     parser.add_argument("--way",
-                        default='1',
+                        default='2',
                         help='1 - predict, 2 - read predictions')
     parser.add_argument('--THRESHOLD',
                         default=0.3)
@@ -104,6 +104,9 @@ if __name__ == '__main__':
     parser.add_argument("--PRED_PATH_FCN",
                         default=r'D:\Azure Repository\LNU_Course_work\rubbish\FCN/',
                         help='PRED_PATH')
+    parser.add_argument("--FORMAT",
+                        default='.npy',
+                        help='Possible: .npu, .png')
     parser.add_argument("--WEIGHTS_PATH_UNET",
                         default=r"D:\Azure Repository\LNU_Course_work\U_Net_data\u-net_model_epoch=10_valloss=0.1094.h5")
     parser.add_argument("--WEIGHTS_PATH_FCN",
@@ -124,6 +127,7 @@ if __name__ == '__main__':
     MASK_TEST_PATH = args.MASK_TEST_PATH
     PRED_PATH_UNet = args.PRED_PATH_UNet
     PRED_PATH_FCN = args.PRED_PATH_FCN
+    FORMAT = args.FORMAT
     WEIGHTS_PATH_UNET = args.WEIGHTS_PATH_UNET
     WEIGHTS_PATH_FCN = args.WEIGHTS_PATH_FCN
 

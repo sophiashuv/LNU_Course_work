@@ -27,13 +27,14 @@ def get_precision_recall(masks, masks_pred):
         mask_pred_t = (masks_pred > threshold).astype(np.uint8)
         precision_avg = precision_coef(masks.ravel(), mask_pred_t.ravel())
         recall_avg = recall_coef(masks.ravel(), mask_pred_t.ravel())
+
         inputs.loc[i, 'threshold'] = threshold
         inputs.loc[i, 'precision_rate'] = precision_avg
         inputs.loc[i, 'recall_rate'] = recall_avg
     return inputs
 
 
-def build_roc_curve(architectures, way,  WEIGHTS_PATH, TEST_PATH, MASK_TEST_PATH, PRED_PATH=None):
+def build_roc_curve(architectures, way,  WEIGHTS_PATH, TEST_PATH, MASK_TEST_PATH, PRED_PATH=None, FORMAT=None):
     fprs, tprs, roc_aucs = [], [], []
     for i, (architecture, weight) in enumerate(zip(architectures, WEIGHTS_PATH)):
         if architecture == 'U-Net':
@@ -50,39 +51,51 @@ def build_roc_curve(architectures, way,  WEIGHTS_PATH, TEST_PATH, MASK_TEST_PATH
             return
 
         inputs = get_fp_tp(Y_test, Y_pred)
-        fpr, tpr = inputs['false_positive_rate'], inputs['true_positive_rate']
+        inputs = inputs.dropna()
+        fpr, tpr = inputs['false_positive_rate'].astype(float), inputs['true_positive_rate'].astype(float)
+        p = fpr.argsort()
+        fpr, tpr = fpr[p], tpr[p]
         # fpr, tpr, _ = roc_curve(Y_test.ravel(), Y_pred.ravel())
-        roc_auc = auc(fpr, tpr)
-        fprs.append(fpr)
-        tprs.append(tpr)
+        x = np.linspace(0, 1, 1000)
+        y = np.interp(x, fpr, tpr)
+        roc_auc = auc(x, y)
+        fprs.append(x)
+        tprs.append(y)
         roc_aucs.append(roc_auc)
     return fprs, tprs, roc_aucs
 
 
-def build_precision_recall_curve(architectures, way,  WEIGHTS_PATH, TEST_PATH, MASK_TEST_PATH, PRED_PATH=None):
+def build_precision_recall_curve(architectures, way,  WEIGHTS_PATH, TEST_PATH, MASK_TEST_PATH, PRED_PATH=None, FORMAT=None):
     precisions, recols, pr_aucs = [], [], []
     for i, (architecture, weight) in enumerate(zip(architectures, WEIGHTS_PATH)):
         if architecture == 'U-Net':
             model = U_Net(IMG_WIDTH, IMG_HEIGHT, IMG_CHANNELS)
         elif architecture == 'FCN':
             model = FCN(IMG_WIDTH, IMG_HEIGHT, IMG_CHANNELS)
-        elif architecture == 'DeeplabV3Plus':
-            model = DeeplabV3Plus(IMG_WIDTH, IMG_HEIGHT, IMG_CHANNELS)
         else:
             return
 
         if way == '1':
-            _, X_test, Y_test, Y_pred = predict_images(model, TEST_PATH, MASK_TEST_PATH, weight, "no", 20)
+            test_ids, X_test, Y_test, Y_pred = predict_images(model, TEST_PATH, MASK_TEST_PATH, weight, "no", 20)
         elif way == '2':
-            test_ids, X_test, Y_test, Y_pred = read_predicted_images(TEST_PATH, MASK_TEST_PATH, PRED_PATH[i], "no", 20)
+            test_ids, X_test, Y_test, Y_pred = read_predicted_images(TEST_PATH, MASK_TEST_PATH, PRED_PATH[i], "no", 20, FORMAT)
         else:
             return
-
         inputs = get_precision_recall(Y_test, Y_pred)
-        precision, recall = inputs['precision_rate'], inputs['recall_rate']
-        pr_auc = auc(recall, precision)
-        precisions.append(precision)
-        recols.append(recall)
+
+        inputs = inputs.dropna()
+
+        precision, recall = inputs['precision_rate'].astype(float), inputs['recall_rate'].astype(float)
+        p = precision.argsort()
+        precision, recall = precision[p], recall[p]
+
+        x = np.linspace(0, 1, 1000)
+        y = np.interp(x, precision, recall)
+
+        pr_auc = auc(x, y)
+        precisions.append(x)
+        recols.append(y)
         pr_aucs.append(pr_auc)
+
     return precisions, recols, pr_aucs
 
