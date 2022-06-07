@@ -79,6 +79,46 @@ def read_predicted_images(TEST_PATH, MASK_TEST_PATH, PRED_PATH, TRESHHOLD, amoun
     return test_ids, X_test, Y_test, Y_pred
 
 
+def read_prediction_masks(MASK_TEST_PATH, PRED_PATH, TRESHHOLD, amount=-1, format=".jpg"):
+
+    test_ids = get_images_ids(MASK_TEST_PATH, amount)
+    Y_test = np.zeros((len(test_ids), IMG_HEIGHT, IMG_WIDTH, 1), dtype=np.bool)
+    Y_pred = np.zeros((len(test_ids), IMG_HEIGHT, IMG_WIDTH, 1), dtype=np.float32)
+    if format == ".jpg":
+        print()
+        print(PRED_PATH)
+        for n, id_ in tqdm(enumerate(test_ids), total=len(test_ids)):
+
+            pred = cv2.imread(PRED_PATH + id_[:-3] + "jpg", 0)
+            pred = cv2.resize(pred, (IMG_WIDTH, IMG_HEIGHT))
+            pred = np.reshape(pred, (IMG_HEIGHT, IMG_WIDTH, 1))
+            Y_pred[n] = pred/255
+
+            mask = cv2.imread(MASK_TEST_PATH + id_[:-3] + "png", 0)
+            mask = cv2.resize(mask, (IMG_WIDTH, IMG_HEIGHT))
+            mask = np.reshape(mask, (IMG_HEIGHT, IMG_WIDTH, 1))
+            Y_test[n] = mask / 255
+
+    elif format == ".npy":
+        for n, id_ in tqdm(enumerate(test_ids), total=len(test_ids)):
+            with open(PRED_PATH + id_[:-3] + "npy", 'rb') as f:
+                mask = np.load(f)
+            mask = cv2.resize(mask, (IMG_WIDTH, IMG_HEIGHT))
+            mask = np.reshape(mask, (IMG_HEIGHT, IMG_WIDTH, 1))
+            Y_pred[n] = mask
+
+            mask = cv2.imread(PRED_PATH + id_[:-3] + "jpg", 0)
+            mask = cv2.resize(mask, (IMG_WIDTH, IMG_HEIGHT))
+            mask = np.reshape(mask, (IMG_HEIGHT, IMG_WIDTH, 1))
+            Y_test[n] = mask / 255
+
+    if TRESHHOLD != "no":
+        Y_pred = (Y_pred > TRESHHOLD).astype(np.uint8)
+    n = Y_test.shape[0]
+    Y_test, Y_pred = np.reshape(Y_test, (n, IMG_HEIGHT, IMG_WIDTH)), np.reshape(Y_pred, (n, IMG_HEIGHT, IMG_WIDTH))
+    return test_ids, Y_test, Y_pred
+
+
 def read_predicted_image(img_id, TEST_PATH, MASK_TEST_PATH, PRED_PATH, TRESHHOLD, format=".jpg"):
     X_test, Y_test = read_test_img_mask(img_id, TEST_PATH, MASK_TEST_PATH)
 

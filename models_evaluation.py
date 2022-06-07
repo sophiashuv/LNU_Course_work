@@ -19,8 +19,8 @@ def get_metrics_df(test_ids, Y_test, Y_pred, metrics, architecture, THRESHOLD):
                 "accuracy": accuracy,
                 "precision": precision,
                 "recall": recall,
-                "mcc": mcc,
-                'f1': f1
+                'f1': f1,
+                'mcc': mcc
                 }
         metrics = metrics.append(data, ignore_index=True)
     return metrics
@@ -33,13 +33,13 @@ def save_metrics_to_file(metrics, metrics_path):
 def save_benchmark(architecture):
     if architecture == 'U-Net':
         model = U_Net(IMG_WIDTH, IMG_HEIGHT, IMG_CHANNELS)
-    elif architecture == 'FCN':
+    elif architecture == 'FCN-32':
         model = FCN(IMG_WIDTH, IMG_HEIGHT, IMG_CHANNELS)
     else:
         return
 
     test_ids, X_test, Y_test, Y_pred = predict_images(model, TEST_PATH, MASK_TEST_PATH, WEIGHTS_PATH, THRESHOLD)
-    metrics = pd.DataFrame(columns=['MODEL', 'imageFileName', "THRESHOLD", 'iou', 'accuracy', 'precision', 'recall', 'f1'])
+    metrics = pd.DataFrame(columns=['MODEL', 'imageFileName', "THRESHOLD", 'iou', 'accuracy', 'precision', 'recall', 'f1', 'mcc'])
     metrics = get_metrics_df(test_ids, Y_test, Y_pred, metrics, architecture, THRESHOLD)
     save_metrics_to_file(metrics, METRICS_PATH)
 
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--architecture',
                         default='U-Net',
-                        help='Possible: U-Net, FCN')
+                        help='Possible: U-Net, FCN-32')
     parser.add_argument('--THRESHOLD',
                         default=0.3)
     parser.add_argument("--TEST_PATH",
@@ -62,7 +62,7 @@ if __name__ == '__main__':
                         default=r'C:\Users\sophi\OneDrive\Desktop\inherited_dataset\masks\2018_01_08_tes/',
                         help='TEST MASKS PATH')
     parser.add_argument("--WEIGHTS_PATH",
-                        default=r"D:\Azure Repository\LNU_Course_work\U_Net_data\u-net_model_epoch=10_valloss=0.1094.h5")
+                        default=r"D:\Azure Repository\LNU_Course_work\U_Net_data\U-Net_model_epoch=10_valloss=0.0812.h5")
     parser.add_argument("--METRICS_PATH",
                         default=r"D:\Azure Repository\LNU_Course_work\metrics\metrics.csv")
     args = parser.parse_args()

@@ -3,7 +3,6 @@ from train_model import *
 
 def model_predict(model, X_test, threshold="no"):
     preds_test = model.predict(X_test, verbose=1)
-
     if threshold == "no":
         return preds_test
     preds_test = (preds_test > threshold).astype(np.uint8)

@@ -8,12 +8,12 @@ def get_image_metrics(METRICS_PATH, y_value, amount, THRESHOLD=0.3):
     metrics = pd.read_csv(METRICS_PATH)
     metrics = metrics[metrics['THRESHOLD'] == THRESHOLD]
     if len(metrics) == 0:
-        print("No data with this treshhold")
+        print("No data with this threshold")
         return
 
     models = set(metrics["MODEL"])
 
-    p = metrics.groupby(["imageFileName"], as_index=False).mean()
+    p = metrics.groupby(["imageFileName"], as_index=False).mean()[:amount]
     p = p.sort_values([y_value])
     images = p["imageFileName"]
 
@@ -25,7 +25,7 @@ def get_image_metrics(METRICS_PATH, y_value, amount, THRESHOLD=0.3):
         weight_metrics = weight_metrics.reset_index()
         y.append(weight_metrics[y_value])
     y = np.array(y)
-    return models, images[:amount], y[:, :amount]
+    return models, images, y
 
 
 def get_model_avg(METRICS_PATH, THRESHOLD=0.3):

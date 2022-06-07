@@ -33,7 +33,11 @@ def model_fit(model, X_train, Y_train, SAVE_PATH, log_dir):
 def train_model(architecture, TRAIN_PATH, MASK_PATH, SAVE_PATH):
     if architecture == 'U-Net':
         model = U_Net(IMG_WIDTH, IMG_HEIGHT, IMG_CHANNELS)
-    elif architecture == 'FCN':
+    elif architecture == 'FCN-8':
+        model = FCN(IMG_WIDTH, IMG_HEIGHT, IMG_CHANNELS, fcn8=True)
+    elif architecture == 'FCN-16':
+        model = FCN(IMG_WIDTH, IMG_HEIGHT, IMG_CHANNELS, fcn16=True)
+    elif architecture == 'FCN-32':
         model = FCN(IMG_WIDTH, IMG_HEIGHT, IMG_CHANNELS)
     elif architecture == 'DeeplabV3Plus':
         model = DeeplabV3Plus(IMG_WIDTH, IMG_HEIGHT, IMG_CHANNELS)
@@ -50,7 +54,7 @@ def train_model(architecture, TRAIN_PATH, MASK_PATH, SAVE_PATH):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--architecture',
-                        default='U-Net',
+                        default='FCN-8',
                         help='Possible: U-Net, FCN')
     parser.add_argument('--TRAIN_PATH',
                         default=r'C:\Users\sophi\OneDrive\Desktop\inherited_dataset\images\2018_01_08_tra/',

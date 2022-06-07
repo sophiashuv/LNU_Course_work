@@ -6,7 +6,6 @@ def get_confusion_matrix(y_true, y_pred):
     difference = y_pred - y_true
     difference2 = y_true - y_pred
     sum = y_true + y_pred
-
     TP = sum[sum == 2].shape[0]
     FN = difference[difference2 == 1].shape[0]
     FP = difference[difference == 1].shape[0]
@@ -38,14 +37,14 @@ def accuracy_coef(y_true, y_pred):
 def precision_coef(y_true, y_pred):
     TN, FP, FN, TP = get_confusion_matrix(y_true, y_pred)
     if FP + TP == 0:
-        return None
+        return 1
     return TP/(FP + TP)
 
 
 def recall_coef(y_true, y_pred):
     TN, FP, FN, TP = get_confusion_matrix(y_true, y_pred)
     if FN + TP == 0:
-        return None
+        return 1
     return TP/(FN + TP)
 
 
@@ -72,6 +71,6 @@ def mcc_coef(y_true, y_pred):
 
 def F1_coef(y_true, y_pred):
     TN, FP, FN, TP = get_confusion_matrix(y_true, y_pred)
-    if TP + (FP + FN)/2:
+    if TP + (FP + FN)/2 == 0:
         return 0
     return TP / (TP + (FP + FN)/2)
